@@ -1,0 +1,33 @@
+{
+  "name": "koot-tencent-website",
+  "description": "Tencent Serverless Static Website",
+  "version": "1.0.0",
+  "main": "./serverless.js",
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "lint": "eslint . --fix --cache"
+  },
+  "author": "CMUX",
+  "license": "Apache",
+  "dependencies": {
+    "@serverless/tencent-cos": "^1.2.15",
+    "@serverless/tencent-cdn": "^0.1.4",
+    "@serverless/core": "^1.0.0",
+    "cos-nodejs-sdk-v5": "^2.5.14",
+    "tencentcloud-sdk-nodejs": "^3.0.87",
+    "serverless-tencent-tools": "^0.0.9",
+    "serverless-tencent-auth-tool": "^1.0.14",
+    "child_process": "^1.0.2"
+  },
+  "devDependencies": {
+    "babel-eslint": "9.0.0",
+    "eslint": "5.6.0",
+    "eslint-config-prettier": "^3.6.0",
+    "eslint-plugin-import": "^2.14.0",
+    "eslint-plugin-prettier": "^3.0.1",
+    "prettier": "^1.15.3"
+  }
+}
