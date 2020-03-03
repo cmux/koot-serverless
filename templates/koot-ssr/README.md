@@ -42,7 +42,7 @@ module.exports = {
 
 确保同一个环境的npm scripts中打包和发布的环境变量`target`。
 
-```json
+```
 // package.json
 {
     // ...

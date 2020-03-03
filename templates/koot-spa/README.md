@@ -1,4 +1,4 @@
-# Koot.js SSR × serverless模板
+# Koot.js SPA × serverless模板
 ## 全局安装 serverless
 
 ```
@@ -9,7 +9,7 @@ npm i -g serverless
 
 ### serverless/config.js
 
-可以分环境配置，相关字段由运维提供：code、appName、secretId、secretKey、region、bucketName、functionName、serviceId。
+可以分环境配置，相关字段由运维提供：code、appName、secretId、secretKey、region、bucketName。
 
 ```js
 // serverless/config.js
@@ -21,9 +21,7 @@ module.exports = {
         secretKey: '',
         region: 'ap-beijing',
         bucketName: '',
-        appName: '',
-        functionName: '',
-        serviceId: ''
+        appName: ''
     },
     prod: {
         code: './dist',
@@ -31,9 +29,7 @@ module.exports = {
         secretKey: '',
         region: 'ap-beijing',
         bucketName: '',
-        appName: '',
-        functionName: '',
-        serviceId: ''
+        appName: ''
     }
 };
 ```
@@ -42,16 +38,16 @@ module.exports = {
 
 确保同一个环境的npm scripts中打包和发布的环境变量`target`。
 
-```json
+```
 // package.json
 {
     // ...
     "scripts": {
         // ...
-        "build:qa": "koot-build --config ./serverless/koot.config.js -- target=qa",
-        "build:prod": "koot-build --config ./serverless/koot.config.js -- target=prod",
-        "deploy:qa": "export target=qa && node serverless/deploy.js",
-        "deploy:prod": "export target=prod && node serverless/deploy.js",
+        "build:qa": "koot-build --type spa --config ./serverless/koot.config.spa.js -- target=qa",
+        "build:prod": "koot-build --type spa --config ./serverless/koot.config.spa.js -- target=prod",
+        "deploy:qa": "export target=qa && node serverless/deploy.spa.js",
+        "deploy:prod": "export target=prod && node serverless/deploy.spa.js",
         // ...
     }
     // ...
