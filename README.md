@@ -1,6 +1,6 @@
 # koot-serverless
 
-将Koot.js SSR的产出物发布到腾讯云serverless服务，提供了：  
+将Koot.js SSR项目发布到腾讯云serverless服务，提供了：  
 
 - 支持控制旧版本数量的腾讯云serverless components
 - 基于Koot.js和serverless的打包发布脚本
