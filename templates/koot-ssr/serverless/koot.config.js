@@ -43,7 +43,7 @@ kootConfig.serverless = true;
 kootConfig.bundleVersionsKeep = false;
 kootConfig.exportGzip = false;
 kootConfig.dist = slsConfig.code;
-kootConfig.defines.__PUBLICK_PATH__ = JSON.stringify(publicPath);
+kootConfig.defines.__PUBLIC_PATH__ = JSON.stringify(publicPath);
 
 const oldWebpackConfig = kootConfig.webpackConfig;
 

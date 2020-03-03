@@ -5,5 +5,5 @@
 export default {
     performanceInfos: () => `<!-- rendered: ${new Date().toISOString()} -->`,
     svgIconPack: __SVG_ICON_PACK__,
-    publicPath: typeof __PUBLICK_PATH__ === 'undefined' ? '' : __PUBLICK_PATH__
+    publicPath: typeof __PUBLIC_PATH__ === 'undefined' ? '' : __PUBLIC_PATH__
 };
