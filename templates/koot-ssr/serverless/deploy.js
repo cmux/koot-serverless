@@ -31,7 +31,7 @@ const spawn = async cmd => {
 
 const target = process.env.target;
 
-if (!target) throw new Error('env target is required!');
+if (!target) throw new Error('env "target" is required!');
 
 const slsConfig = slsConfigs[target];
 
@@ -48,10 +48,10 @@ const {
     serviceId
 } = slsConfig;
 
-if (!code) throw new Error('code is Required!');
-if (!appName) throw new Error('appName is Required!');
-if (!region) throw new Error('region is Required!');
-if (!bucketName) throw new Error('bucketName is Required!');
+if (!code) throw new Error('"code" is Required!');
+if (!appName) throw new Error('"appName" is Required!');
+if (!region) throw new Error('"region" is Required!');
+if (!bucketName) throw new Error('"bucketName" is Required!');
 
 const distPath = path.resolve(slsConfig.code);
 const csrPath = path.join(distPath, 'public');
@@ -59,10 +59,14 @@ const ssrPath = path.join(distPath, 'server');
 const verPath = path.join(distPath, 'version.txt');
 const slsPath = path.join(distPath, `../serverless/${target}`);
 
-if (!fs.pathExistsSync(distPath)) throw new Error(`${distPath} is not exist!`);
-if (!fs.pathExistsSync(verPath)) throw new Error(`${verPath} is not exist!`);
-if (!fs.pathExistsSync(csrPath)) throw new Error(`${csrPath} is not exist!`);
-if (!fs.pathExistsSync(ssrPath)) throw new Error(`${ssrPath} is not exist!`);
+if (!fs.pathExistsSync(distPath))
+    throw new Error(`Path "${distPath}" is not exist!`);
+if (!fs.pathExistsSync(verPath))
+    throw new Error(`Path "${verPath}" is not exist!`);
+if (!fs.pathExistsSync(csrPath))
+    throw new Error(`Path "${csrPath}" is not exist!`);
+if (!fs.pathExistsSync(ssrPath))
+    throw new Error(`Path "${ssrPath}" is not exist!`);
 
 const version = fs.readFileSync(verPath, 'utf8');
 const publicTmpPath = path.join(slsPath, '.public');

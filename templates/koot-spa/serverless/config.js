@@ -1,18 +1,18 @@
 module.exports = {
     qa: {
         code: './dist-qa',
-        secretId: '',
-        secretKey: '',
-        region: 'ap-beijing',
+        appName: 'my-app',
+        region: '',
         bucketName: '',
-        appName: ''
+        secretId: '',
+        secretKey: ''
     },
     prod: {
         code: './dist',
-        secretId: '',
-        secretKey: '',
+        appName: 'my-app-2',
         region: 'ap-beijing',
-        bucketName: '',
-        appName: ''
+        bucketName: 'my-app-1252144562',
+        secretId: '',
+        secretKey: ''
     }
 };
