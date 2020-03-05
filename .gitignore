@@ -2,3 +2,6 @@ yarn.lock
 package-lock.json
 **/serverless/prod
 **/serverless/qa
+.serverless
+.env_temp
+serverless.yml

@@ -1,0 +1,37 @@
+{
+    "name": "main",
+    "version": "1.0.0",
+    "description": "",
+    "main": "index.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "author": "",
+    "license": "ISC",
+    "dependencies": {
+        "eslint": "^6.8.0",
+        "eslint-config-koot": "^1.6.0",
+        "http-proxy-middleware": "^1.0.1",
+        "husky": "^4.2.3",
+        "koa": "^2.11.0",
+        "koa2-connect": "^1.0.2",
+        "lint-staged": "^10.0.8"
+    },
+    "eslintIgnore": [
+        "node_modules/**/*"
+    ],
+    "husky": {
+        "hooks": {
+            "pre-commit": "lint-staged"
+        }
+    },
+    "lint-staged": {
+        "*.{js,jsx,cjs,mjs,ts,tsx}": [
+            "eslint --fix",
+            "prettier --write"
+        ],
+        "*.{json,md,css,less,sass,scss}": [
+            "prettier --write"
+        ]
+    }
+}

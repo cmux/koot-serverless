@@ -25,7 +25,7 @@ const PageHome = extend({
 })(({ className }) => (
     <div className={className}>
         <div className="wrapper">
-            <h2 className="title">Koot.js</h2>
+            <h2 className="title">Koot.js a站</h2>
             <span className="intro">
                 {intros.map((str, index) => (
                     <span className="line" key={index}>
@@ -33,9 +33,12 @@ const PageHome = extend({
                     </span>
                 ))}
             </span>
-            <Link className="button-start" to="/start">
+            <Link className="button-start" to="/a/start">
                 {__('pages.home.start')}
             </Link>
+            <a className="button-start" href="/">
+                去主站
+            </a>
         </div>
         <div className="nav">
             {navItems.concat([[urlGithub, 'github']]).map((item, index) => (

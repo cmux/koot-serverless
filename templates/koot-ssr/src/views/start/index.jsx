@@ -41,7 +41,7 @@ const PageStart = extend({
         </ul>
         <p className="bonus">
             <strong>{__('pages.start.bonus')}</strong>
-            <Link to="/ts">{__('pages.start.bonusComponentInTS')}</Link>
+            <Link to="/a/ts">{__('pages.start.bonusComponentInTS')}</Link>
         </p>
     </Center>
 ));

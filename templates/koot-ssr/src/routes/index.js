@@ -7,7 +7,7 @@ import App from '@views/app';
  * - 可使用 koot-router 提供的方法封装路由配置对象
  */
 export default {
-    path: '/',
+    path: '/a',
     component: App, // 项目的根层组件
 
     indexRoute: {
