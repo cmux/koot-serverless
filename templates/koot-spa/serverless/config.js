@@ -10,8 +10,8 @@ module.exports = {
     prod: {
         code: './dist',
         appName: 'my-app-2',
-        region: 'ap-beijing',
-        bucketName: 'my-app-1252144562',
+        region: '',
+        bucketName: '',
         secretId: '',
         secretKey: ''
     }
