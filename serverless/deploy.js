@@ -31,7 +31,7 @@ const spawn = async cmd => {
 
 const target = process.env.target;
 
-if (!target) throw new Error('env target is required!');
+if (!target) throw new Error('env "target" is required!');
 
 const slsConfig = slsConfigs[target];
 
@@ -48,14 +48,10 @@ const {
     serviceId
 } = slsConfig;
 
-if (!code) throw new Error('code is Required!');
-if (!appName) throw new Error('appName is Required!');
-if (!secretId) throw new Error('secretId is Required!');
-if (!secretKey) throw new Error('secretKey is Required!');
-if (!region) throw new Error('region is Required!');
-if (!bucketName) throw new Error('bucketName is Required!');
-if (!functionName) throw new Error('functionName is Required!');
-if (!serviceId) throw new Error('serviceId is Required!');
+if (!code) throw new Error('"code" is Required!');
+if (!appName) throw new Error('"appName" is Required!');
+if (!region) throw new Error('"region" is Required!');
+if (!bucketName) throw new Error('"bucketName" is Required!');
 
 const distPath = path.resolve(slsConfig.code);
 const csrPath = path.join(distPath, 'public');
@@ -63,28 +59,40 @@ const ssrPath = path.join(distPath, 'server');
 const verPath = path.join(distPath, 'version.txt');
 const slsPath = path.join(distPath, `../serverless/${target}`);
 
-if (!fs.pathExistsSync(distPath)) throw new Error(`${distPath} is not exist!`);
-if (!fs.pathExistsSync(verPath)) throw new Error(`${verPath} is not exist!`);
-if (!fs.pathExistsSync(csrPath)) throw new Error(`${csrPath} is not exist!`);
-if (!fs.pathExistsSync(ssrPath)) throw new Error(`${ssrPath} is not exist!`);
+if (!fs.pathExistsSync(distPath))
+    throw new Error(`Path "${distPath}" is not exist!`);
+if (!fs.pathExistsSync(verPath))
+    throw new Error(`Path "${verPath}" is not exist!`);
+if (!fs.pathExistsSync(csrPath))
+    throw new Error(`Path "${csrPath}" is not exist!`);
+if (!fs.pathExistsSync(ssrPath))
+    throw new Error(`Path "${ssrPath}" is not exist!`);
 
 const version = fs.readFileSync(verPath, 'utf8');
 const publicTmpPath = path.join(slsPath, '.public');
 
 // 生成 .env
-const envPath = path.join(slsPath, '.env');
-slsLog(`create ${envPath}`);
-const envContent = `TENCENT_SECRET_ID=${secretId}
+if (secretId && secretKey) {
+    const envPath = path.join(slsPath, '.env');
+    slsLog(`create ${envPath}`);
+    const envContent = `TENCENT_SECRET_ID=${secretId}
 TENCENT_SECRET_KEY=${secretKey}`;
-fs.outputFileSync(envPath, envContent);
+    fs.outputFileSync(envPath, envContent);
+}
 
 // 生成 serverless.yml
 const ymlPath = path.join(slsPath, 'serverless.yml');
 slsLog(`create ${ymlPath}`);
+const serviceIdContent =
+    functionName && serviceId
+        ? `
+        serviceId: ${serviceId}`
+        : '';
+
 const ymlContent = `name: ${appName}
 
 koot-csr:
-    component: '@daqi/tencent-website'
+    component: 'koot-tencent-website'
     inputs:
         code:
             root: ${publicTmpPath}
@@ -93,12 +101,11 @@ koot-csr:
         keepVersion: 2
 
 koot-ssr:
-    component: '@daqi/tencent-koa'
+    component: 'koot-tencent-koa'
     inputs:
         code: ${distPath}
         region: ${region}
-        functionName: ${functionName}
-        serviceId: ${serviceId}
+        functionName: ${functionName || appName}${serviceIdContent}
         keepVersion: 2`;
 
 fs.outputFileSync(ymlPath, ymlContent);
@@ -128,5 +135,33 @@ const run = async () => {
     // sls发布
     slsLog('sls deploy');
     await spawn(`cd ${slsPath} && sls --debug`);
+    // 回写配置
+    const ssrJsonPath = path.resolve(
+        slsPath,
+        '.serverless/Template.koot-ssr.TencentCloudFunction.json'
+    );
+    const apiJsonPath = path.resolve(
+        slsPath,
+        '.serverless/Template.koot-ssr.TencentApiGateway.json'
+    );
+    if (!fs.pathExistsSync(apiJsonPath)) {
+        throw new Error(`${apiJsonPath} not exist!`);
+    } else if (!fs.pathExistsSync(ssrJsonPath)) {
+        throw new Error(`${ssrJsonPath} not exist!`);
+    } else {
+        const ssrNext = fs.readJsonSync(ssrJsonPath);
+        if (!ssrNext.deployed) throw new Error(`deployed failed!`);
+        const apiNext = fs.readJsonSync(apiJsonPath);
+        if (!apiNext.service) throw new Error(`Api service create failed!`);
+        const rewriteConfig = require('./rewriteConfig');
+        slsLog('rewrite serverless/config.js');
+        rewriteConfig(
+            {
+                functionName: ssrNext.deployed.Name,
+                serviceId: apiNext.service.value
+            },
+            path.join(slsPath, '../config.js')
+        );
+    }
 };
 run();

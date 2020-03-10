@@ -14,7 +14,7 @@ const kootConfig = require('../koot.config');
 
 const target = process.env.target;
 
-if (!target) throw new Error('env target is required!');
+if (!target) throw new Error('env "target" is required!');
 
 const slsConfig = slsConfigs[target];
 
@@ -36,6 +36,7 @@ const version = (isQA => {
 
 // publicPath
 const { appName } = slsConfig;
+if (!appName) throw new Error('"appName" is Required!');
 
 // kootConfig 修改
 kootConfig.serverless = true;
@@ -45,20 +46,24 @@ kootConfig.dist = slsConfig.code;
 kootConfig.historyType = 'browser';
 kootConfig.distClientAssetsDirName = `${appName}_${version}`;
 
+const oldWebpackBefore = kootConfig.webpackBefore;
 kootConfig.webpackBefore = async kootConfigWithExtra => {
+    if (oldWebpackBefore) await oldWebpackBefore(kootConfigWithExtra);
     const { __CLIENT_ROOT_PATH } = kootConfigWithExtra;
     if (__CLIENT_ROOT_PATH) {
         fs.emptyDirSync(__CLIENT_ROOT_PATH);
     }
 };
 
+const oldWebpackAfter = kootConfig.webpackAfter;
 kootConfig.webpackAfter = async kootConfigWithExtra => {
+    if (oldWebpackAfter) await oldWebpackAfter(kootConfigWithExtra);
     // 整理文件夹
     const { __CLIENT_ROOT_PATH } = kootConfigWithExtra;
     if (__CLIENT_ROOT_PATH) {
         const distPath = __CLIENT_ROOT_PATH;
         fs.removeSync(path.join(distPath, '.server'));
-        console.log('new version: ', version);
+        console.log(`new version: "${version}"`);
         fs.outputFileSync(path.join(distPath, 'version.txt'), version);
     }
 };
