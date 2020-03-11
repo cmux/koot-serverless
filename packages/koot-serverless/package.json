@@ -1,0 +1,30 @@
+{
+    "name": "koot-serverless",
+    "version": "0.0.1",
+    "description": "koot-serverless",
+    "main": "src/index.js",
+    "sideEffects": false,
+    "bin": {
+        "koot-sls": "./bin/deploy.js"
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/cmux/koot-serverless"
+    },
+    "license": "Apache-2.0",
+    "author": {
+        "name": "CMUX"
+    },
+    "contributors": [
+        {
+            "name": "daqi",
+            "email": "daqidaqi@qq.com",
+            "url": "http://daqi.io"
+        }
+    ],
+    "engines": {
+        "node": ">=8.9.0"
+    },
+    "dependencies": {
+    }
+}
