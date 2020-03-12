@@ -1,5 +1,3 @@
-#!/usr/bin/env node
-
 /**
  * 发布脚本
  *
@@ -12,27 +10,25 @@
 const path = require('path');
 const { spawn, slsErr, slsLog } = require('../src/utils');
 
-const target = process.argv[2];
-if (!target) throw new Error('USAGE: koot-serverless <target>');
-
-const rootPath = process.cwd();
-const serverlessPath = path.join(rootPath, 'serverless');
-const slsConfigs = require(path.join(serverlessPath, 'config'));
-
-const slsConfig = slsConfigs[target];
-if (!slsConfig)
-    slsErr(`Config "${target}" is required in "serverless/config.js"!`);
-
-const { code } = slsConfig;
-
-if (!code) slsErr('Prop "code" is Required in "serverless/config.js"!');
-
-const serverPath = path.join(serverlessPath, code, 'server');
-const publicPath = path.join(serverlessPath, code, 'public');
-
 const slsLogDeploy = (...args) => slsLog('Deploying:', ...args);
 
-const run = async () => {
+const deploy = async () => {
+    const target = process.argv[2];
+    if (!target) throw new Error('USAGE: koot-serverless <target>');
+
+    const rootPath = process.cwd();
+    const serverlessPath = path.join(rootPath, 'serverless');
+    const slsConfigs = require(path.join(serverlessPath, 'config'));
+    const slsConfig = slsConfigs[target];
+    if (!slsConfig)
+        slsErr(`Config "${target}" is required in "serverless/config.js"!`);
+
+    const { code } = slsConfig;
+
+    const serverPath = path.join(serverlessPath, code, 'server');
+    const publicPath = path.join(serverlessPath, code, 'public');
+
+    if (!code) slsErr('Prop "code" is Required in "serverless/config.js"!');
     // 安装依赖
     slsLogDeploy('Installing dependencies');
     await spawn(`cd ${serverPath} && yarn`);
@@ -77,4 +73,4 @@ const run = async () => {
     await spawn(`cd ${rootPath} && sls --debug`);
 };
 
-run();
+module.exports = deploy;

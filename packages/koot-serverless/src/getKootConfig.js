@@ -1,37 +1,35 @@
 const fs = require('fs-extra');
 const path = require('path');
-const utils = require('./utils');
+const { getVersion, slsErr, slsLog } = require('./utils');
 
 const rootPath = process.cwd();
-
-const slsConfigs = require(path.join(rootPath, './serverless/config'));
-
-const err = msg => {
-    throw new Error(`getKootConfig: ${msg}`);
-};
-const target = process.env.target;
-if (!target) throw new Error('env "target" is required in npm script!');
-
-const slsConfig = slsConfigs[target];
-if (!slsConfig)
-    err(`config "${target}" is required in "serverless/config.js"!`);
-
-const name = require(path.join(rootPath, './package.json')).name;
-if (!name) {
-    err('"name" is required in "package.json"!');
-}
+const slsLogBuild = (...args) => slsLog('Building:', ...args);
 
 /**
  * getKootConfig
  * @param {*} kootConfig
  */
 function getKootConfig(kootConfig) {
+    const slsConfigs = require(path.join(rootPath, './serverless/config'));
+
+    const target = process.env.target;
+    if (!target) slsErr('env "target" is required in npm script!');
+
+    const slsConfig = slsConfigs[target];
+    if (!slsConfig)
+        slsErr(`config "${target}" is required in "serverless/config.js"!`);
+
+    const name = require(path.join(rootPath, './package.json')).name;
+    if (!name) {
+        slsErr('"name" is required in "package.json"!');
+    }
+
     const { code, publicPath } = slsConfig;
     if (!code) {
-        err('"code" is required in "serverless/config.js"!');
+        slsErr('"code" is required in "serverless/config.js"!');
     }
     if (!publicPath) {
-        err('"publicPath" is required in "serverless/config.js"!');
+        slsErr('"publicPath" is required in "serverless/config.js"!');
     }
 
     const nextKootConfig = {
@@ -42,7 +40,7 @@ function getKootConfig(kootConfig) {
         dist: path.join('./serverless', code, 'server')
     };
 
-    const version = utils.getVersion('release_' + target);
+    const version = getVersion('release_' + target);
 
     const relativePath = `${name}_${version}`;
     const _publicPath = `${publicPath.replace(/\/$/, '')}/${relativePath}`;
@@ -89,11 +87,9 @@ function getKootConfig(kootConfig) {
         if (!__CLIENT_ROOT_PATH && __WEBPACK_OUTPUT_PATH) {
             const serverPath = __WEBPACK_OUTPUT_PATH;
             const distPath = path.join(serverPath, '..');
-            const log = (...args) =>
-                console.log('<SERVERLESS PREPARE FLOW>', ...args);
 
             // 移动lock文件
-            log('move lock file');
+            slsLogBuild('move lock file');
             ['yarn.lock', 'package-lock.json'].forEach(filename => {
                 const filePath = path.resolve(rootPath, filename);
                 if (fs.pathExistsSync(filePath)) {
@@ -103,16 +99,16 @@ function getKootConfig(kootConfig) {
                 }
             });
             // 生成 version
-            log(`new version: "${version}"`);
+            slsLogBuild(`new version: "${version}"`);
             fs.outputFileSync(path.join(distPath, 'version.txt'), version);
             // 生成 app.js
-            log('create app.js for serverless');
+            slsLogBuild('create app.js for serverless');
             const appContent = 'module.exports = require("./server").default;';
             fs.outputFileSync(path.join(distPath, 'app.js'), appContent);
             // 复制 publicCode
             const publicCodePath = path.join(distPath, '../public');
             const csrPathx = path.join(publicCodePath, relativePath);
-            log(`copy public to ${csrPathx}`);
+            slsLogBuild(`copy public to ${csrPathx}`);
             fs.emptyDirSync(publicCodePath);
             fs.copySync(path.join(distPath, 'public'), csrPathx);
         }

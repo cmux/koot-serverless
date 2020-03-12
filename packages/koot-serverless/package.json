@@ -1,11 +1,12 @@
 {
     "name": "koot-serverless",
-    "version": "0.0.1",
+    "version": "0.0.8",
     "description": "koot-serverless",
     "main": "src/index.js",
     "sideEffects": false,
     "bin": {
-        "koot-sls": "./bin/deploy.js"
+        "koot-sls": "./bin/deploy.js",
+        "koot-serverless": "./bin/deploy.js"
     },
     "repository": {
         "type": "git",
@@ -26,5 +27,8 @@
         "node": ">=8.9.0"
     },
     "dependencies": {
+        "fs-extra": "*",
+        "js-yaml": "*",
+        "lodash": "*"
     }
 }

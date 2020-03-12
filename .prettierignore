@@ -1,0 +1,5 @@
+/dist/
+/logs/
+
+**/serverless/**/.public
+**/serverless/**/.serverless
