@@ -52,7 +52,7 @@ class Provider {
         Timeout: funcObject.timeout || 3,
         Region: funcObject.region || 'ap-guangzhou',
         Runtime: funcObject.runtime || 'Nodejs8.9',
-        Tags: {
+        Tags: this.inputs.tags || {
           CLI: 'Serverless'
         }
       }
