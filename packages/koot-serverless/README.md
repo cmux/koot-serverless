@@ -57,6 +57,8 @@ koot-ssr:
         region: $region
         functionName: $functionName
         serviceId: $serviceId
+        tags:
+            ux: $tagvalue
 ```
 5. 执行发布脚本
 ```
