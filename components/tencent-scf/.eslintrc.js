@@ -39,7 +39,7 @@ module.exports = {
         min: 2,
         max: 50,
         properties: 'never',
-        exceptions: ['e', 'i', 'n', 't', 'x', 'y', 'z', '_', '$']
+        exceptions: ['e', 'i', 'j', 'n', 't', 'x', 'y', 'z', '_', '$']
       }
     ],
     'no-alert': 'error',

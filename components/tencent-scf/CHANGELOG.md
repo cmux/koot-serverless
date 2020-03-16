@@ -2,6 +2,37 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [3.0.1](https://github.com/serverless-components/tencent-scf/compare/v3.0.0...v3.0.1) (2020-03-12)
+
+
+### Bug Fixes
+
+* apigw trigger output ([575f30a](https://github.com/serverless-components/tencent-scf/commit/575f30a5cae482984b31efae1158e609e11d38b7))
+
+### [2.1.4](https://github.com/serverless-components/tencent-scf/compare/v2.1.3...v2.1.4) (2020-03-09)
+
+
+### Bug Fixes
+
+* namespace change or region change code not upload bug ([2b43614](https://github.com/serverless-components/tencent-scf/commit/2b436141be031a1133202dbd25c0cd7292792db2))
+* remove unuse npm folder ([5d9c147](https://github.com/serverless-components/tencent-scf/commit/5d9c147b97c17edc1fa7edc60597ee8729cf5826))
+
+### [2.1.3](https://github.com/serverless-components/tencent-scf/compare/v2.1.1...v2.1.3) (2020-03-04)
+
+
+### Bug Fixes
+
+* function name change need update code cos ([41119a3](https://github.com/serverless-components/tencent-scf/commit/41119a3a65ef92d94f5d69c76d726978151df46f))
+* version ([8985349](https://github.com/serverless-components/tencent-scf/commit/8985349b515910937068227fdec87adaacda46d1))
+* version ([85830ae](https://github.com/serverless-components/tencent-scf/commit/85830ae366984a968e34c40f8b6840eb385d8899))
+
+### [2.1.2](https://github.com/serverless-components/tencent-scf/compare/v2.1.1...v2.1.2) (2020-03-04)
+
+
+### Bug Fixes
+
+* function name change need update code cos ([c546ba7](https://github.com/serverless-components/tencent-scf/commit/c546ba7178acc384df7c0ab79997abd7cb6e826f))
+
 ### [2.1.1](https://github.com/serverless-components/tencent-scf/compare/v2.1.0...v2.1.1) (2020-02-27)
 
 

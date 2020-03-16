@@ -8,7 +8,7 @@ const models = tencentcloud.scf.v20180416.Models
 const camModels = tencentcloud.cam.v20190116.Models
 
 class DeployFunction extends Abstract {
-  async deploy(ns, funcObject, updateCode = true) {
+  async deploy(ns, funcObject) {
     const func = await this.getFunction(ns, funcObject.FuncName)
     if (!func) {
       await this.createFunction(ns, funcObject)
@@ -16,14 +16,12 @@ class DeployFunction extends Abstract {
       if (func.Runtime != funcObject.Properties.Runtime) {
         throw `Runtime error: Release runtime(${func.Runtime}) and local runtime(${funcObject.Properties.Runtime}) are inconsistent`
       }
-      if (updateCode) {
-        this.context.debug('Updating code... ')
-        await this.updateFunctionCode(ns, funcObject)
-        if ((await this.checkStatus(ns, funcObject)) == false) {
-          throw `Function ${funcObject.FuncName} update failed`
-        }
-        this.context.debug('Updating configure... ')
+      this.context.debug('Updating code... ')
+      await this.updateFunctionCode(ns, funcObject)
+      if ((await this.checkStatus(ns, funcObject)) == false) {
+        throw `Function ${funcObject.FuncName} update failed`
       }
+      this.context.debug('Updating configure... ')
       await this.updateConfiguration(ns, func, funcObject)
       return func
     }
@@ -258,41 +256,93 @@ class DeployFunction extends Abstract {
     }
   }
 
-  async uploadPackage2Cos(bucketName, key, filePath, onProgress, keepVersion = 2) {
+  async getObject(bucketName, key) {
+    const { region } = this.options
+    const headObjectArgs = {
+      Bucket: bucketName,
+      Key: key,
+      Region: region
+    }
+    const handler = util.promisify(this.cosClient.headObject.bind(this.cosClient))
+    try {
+      await handler(headObjectArgs)
+      return true
+    } catch (e) {
+      return false
+    }
+  }
+
+  async uploadPackage2Cos(bucketName, key, filePath, onProgress, codeUriType = 0, keepVersion = 2) {
     let handler
     const { region } = this.options
     const cosBucketNameFull = util.format('%s-%s', bucketName, this.appid)
 
-    // get region all bucket list
-    let buckets
-    handler = util.promisify(this.cosClient.getService.bind(this.cosClient))
-    try {
-      buckets = await handler({ Region: region })
-    } catch (e) {
-      throw e
-    }
-
-    const findBucket = _.find(buckets.Buckets, (item) => {
-      if (item.Name == cosBucketNameFull) {
-        return item
-      }
-    })
-
-    // create a new bucket
-    if (_.isEmpty(findBucket)) {
-      const putArgs = {
-        Bucket: cosBucketNameFull,
-        Region: region
-      }
-      handler = util.promisify(this.cosClient.putBucket.bind(this.cosClient))
+    if (codeUriType == 0) {
+      // get region all bucket list
+      let buckets
+      handler = util.promisify(this.cosClient.getService.bind(this.cosClient))
       try {
-        await handler(putArgs)
+        buckets = await handler({ Region: region })
       } catch (e) {
         throw e
       }
+
+      const findBucket = _.find(buckets.Buckets, (item) => {
+        if (item.Name == cosBucketNameFull) {
+          return item
+        }
+      })
+
+      // create a new bucket
+      if (_.isEmpty(findBucket)) {
+        const putArgs = {
+          Bucket: cosBucketNameFull,
+          Region: region
+        }
+        handler = util.promisify(this.cosClient.putBucket.bind(this.cosClient))
+        try {
+          await handler(putArgs)
+        } catch (e) {
+          throw e
+        }
+      }
+
+      // 设置Bucket生命周期
+      try {
+        let tempLifeCycle
+        handler = util.promisify(this.cosClient.getBucketLifecycle.bind(this.cosClient))
+        const lifeCycleSetting = await handler({
+          Bucket: cosBucketNameFull,
+          Region: region
+        })
+        for (let i = 0; i < lifeCycleSetting.Rules.length; i++) {
+          if (lifeCycleSetting.Rules[i].ID == 'deleteObject') {
+            tempLifeCycle = true
+            break
+          }
+        }
+        if (!tempLifeCycle) {
+          const putArgs = {
+            Bucket: cosBucketNameFull,
+            Region: region,
+            Rules: [
+              {
+                Status: 'Enabled',
+                ID: 'deleteObject',
+                Filter: '',
+                Expiration: { Days: '10' },
+                AbortIncompleteMultipartUpload: { DaysAfterInitiation: '10' }
+              }
+            ],
+            stsAction: 'cos:PutBucketLifeCycle'
+          }
+          handler = util.promisify(this.cosClient.putBucketLifecycle.bind(this.cosClient))
+          await handler(putArgs)
+        }
+      } catch (e) {}
     }
 
-    // 控制旧版本数量
+    // 控制旧版本数量 by Daqi
     const match = key.match(/(.+?)[\d\-]+\.zip$/)
     const prefix = match ? match[1] : null
     if (prefix) {
