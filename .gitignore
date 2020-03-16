@@ -5,3 +5,4 @@ package-lock.json
 .serverless
 .env_temp
 serverless.yml
+.tencent
