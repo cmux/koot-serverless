@@ -58,7 +58,7 @@ koot-ssr:
         functionName: $functionName
         serviceId: $serviceId
         tags:
-            ux: $tagvalue
+            $tagkey: $tagvalue
 ```
 5. 执行发布脚本
 ```

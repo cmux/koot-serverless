@@ -16,28 +16,29 @@
         "start:server": "koot-start --no-build",
         "build": "koot-build",
         "build:spa": "koot-build --type spa",
-        "build:qa": "koot-build --config ./serverless/koot.config.js -- target=qa",
-        "build:prod": "koot-build --config ./serverless/koot.config.js -- target=prod",
-        "deploy:qa": "cross-env target=qa node serverless/deploy.js",
-        "deploy:prod": "cross-env target=prod node serverless/deploy.js",
         "dev": "koot-dev",
         "dev:no-open": "koot-dev --no-open",
         "dev:spa": "koot-dev --type spa",
         "analyze": "koot-analyze",
         "eslint": "eslint \"src/**/*.+(js|jsx)\"",
         "check-types": "tsc --noEmit",
-        "up": "yarn upgrade-interactive --latest"
+        "up": "yarn upgrade-interactive --latest",
+        "build:qa": "koot-build --config ./serverless/koot.config.js -- target=qa",
+        "build:prod": "koot-build --config ./serverless/koot.config.js -- target=prod",
+        "deploy:qa": "./serverless/deploy.js qa",
+        "deploy:prod": "./serverless/deploy.js prod"
     },
     "dependencies": {
-        "axios": "^0.19.2",
-        "bind-event": "^1.1.2",
-        "classnames": "^2.2.6",
-        "koot": "^0.13.0-beta.1"
+        "koot": "^0.13.3",
+        "koot-serverless": "0.0.10"
     },
     "devDependencies": {
         "@types/classnames": "^2.2.9",
         "autoprefixer": "^9.7.4",
+        "axios": "^0.19.2",
         "babel-eslint": "^10.1.0",
+        "bind-event": "^1.1.2",
+        "classnames": "^2.2.6",
         "cross-env": "^7.0.1",
         "cssnano": "^4.1.10",
         "eslint": "^6.8.0",
@@ -72,7 +73,7 @@
         ]
     },
     "koot": {
-        "version": "0.13.0-beta.1",
+        "version": "0.13.4",
         "baseVersion": "0.12.7"
     }
 }

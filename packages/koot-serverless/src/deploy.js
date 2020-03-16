@@ -14,7 +14,7 @@ const slsLogDeploy = (...args) => slsLog('Deploying:', ...args);
 
 const deploy = async () => {
     const target = process.argv[2];
-    if (!target) throw new Error('USAGE: koot-serverless <target>');
+    if (!target) slsErr('USAGE: koot-serverless <target>');
 
     const rootPath = process.cwd();
     const serverlessPath = path.join(rootPath, 'serverless');
@@ -24,24 +24,40 @@ const deploy = async () => {
         slsErr(`Config "${target}" is required in "serverless/config.js"!`);
 
     const { code } = slsConfig;
-
-    const serverPath = path.join(serverlessPath, code, 'server');
-    const publicPath = path.join(serverlessPath, code, 'public');
+    const distPath = path.join(serverlessPath, code);
+    const serverPath = path.join(distPath, 'server');
+    const publicPath = path.join(distPath, 'public');
 
     if (!code) slsErr('Prop "code" is Required in "serverless/config.js"!');
     // 安装依赖
     slsLogDeploy('Installing dependencies');
     await spawn(`cd ${serverPath} && yarn`);
-    // 读写serverless.yml
     const fs = require('fs-extra');
     const yaml = require('js-yaml');
     const _ = require('lodash');
+    // 读写.env
+    const targetEnvPath = path.join(rootPath, `./.env.${target}`);
+    const envPath = path.join(rootPath, './.env');
+    if (fs.pathExistsSync(targetEnvPath)) {
+        fs.copySync(targetEnvPath, path.join(distPath, '.env'));
+    } else if (fs.pathExistsSync(envPath)) {
+        fs.copySync(envPath, path.join(distPath, '.env'));
+    }
+    // 读写serverless.yml
+    const targetYmlPath = path.join(rootPath, `./serverless.${target}.yml`);
     const ymlPath = path.join(rootPath, './serverless.yml');
     const tplPath = path.join(serverlessPath, './serverless.tpl.yml');
-    if (!fs.pathExistsSync(ymlPath)) {
-        throw new Error('"serverless.yml" could not be found!');
+    if (!fs.pathExistsSync(targetYmlPath) && !fs.pathExistsSync(ymlPath)) {
+        slsErr(
+            `"serverless.yml" or "serverless.${target}.yml" could not be found!`
+        );
     }
-    let slsOptions = yaml.safeLoad(fs.readFileSync(ymlPath, 'utf8'));
+    let slsOptions = yaml.safeLoad(
+        fs.readFileSync(
+            fs.pathExistsSync(targetYmlPath) ? targetYmlPath : ymlPath,
+            'utf8'
+        )
+    );
     // merge
     if (fs.pathExistsSync(tplPath)) {
         // console.log(slsOptions)
@@ -67,10 +83,10 @@ const deploy = async () => {
     slsOptions['koot-ssr'].inputs.code = serverPath;
 
     const slsYamlContent = yaml.safeDump(slsOptions, { indent: 4 });
-    fs.outputFileSync(ymlPath, slsYamlContent);
+    fs.outputFileSync(path.join(distPath, 'serverless.yml'), slsYamlContent);
     // sls发布
     slsLogDeploy('serverless deploy begin!');
-    await spawn(`cd ${rootPath} && sls --debug`);
+    await spawn(`cd ${distPath} && sls --debug`);
 };
 
 module.exports = deploy;
