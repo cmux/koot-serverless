@@ -56,17 +56,17 @@ module.exports = {
 
 ### .env
 
-位于项目根目录，
+位于项目根目录，`$`开头的值需要修改。  
 支持分环境进行配置。执行`deploy:prod`时会优先读取`.env.prod`，其次读取`.env`。
 
 ```
-TENCENT_SECRET_ID=aaa
-TENCENT_SECRET_KEY=bbb
+TENCENT_SECRET_ID=$id
+TENCENT_SECRET_KEY=$key
 ```
 
 ### serverless.yml
 
-位于项目根目录，\$开头的值需要运维修改，
+位于项目根目录，`$`开头的值需要修改。  
 支持分环境进行配置。执行`deploy:prod`时会优先读取`serverless.prod.yml`，其次读取`serverless.yml`。
 更多配置参考：
 
