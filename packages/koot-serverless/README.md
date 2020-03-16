@@ -10,6 +10,10 @@ npx koot-cli
 https://github.com/cmux/koot-serverless/tree/master/packages/koot-serverless
 >Tips：  
 >可以使用chrome插件[GitZip](https://chrome.google.com/webstore/detail/gitzip-for-github/ffabmkklhbepgcgfonabamgnfafbdlkn)进行github文件夹打包下载
+## 安装koot-serverless
+```
+yarn add koot-serverless
+```
 ## 确认编译和发布脚本
 确保同一个环境的npm scripts中打包和发布的环境变量target。
 prod对应生产环境，qa对应测试环境。
