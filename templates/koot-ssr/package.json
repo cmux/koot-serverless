@@ -29,7 +29,7 @@
         "deploy:prod": "./serverless/deploy.js prod"
     },
     "dependencies": {
-        "koot": "^0.13.3",
+        "koot": "^0.13.4",
         "koot-serverless": "0.0.10"
     },
     "devDependencies": {

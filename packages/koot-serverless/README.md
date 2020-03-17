@@ -15,7 +15,7 @@ https://github.com/cmux/koot-serverless/tree/master/packages/koot-serverless
 yarn add koot-serverless
 ```
 ## 确认编译和发布脚本
-确保同一个环境的npm scripts中打包和发布的环境变量target。
+确保同一个环境的`npm scripts`中打包和发布的环境变量`target`。
 prod对应生产环境，qa对应测试环境。
 ```
 // package.json
@@ -32,10 +32,10 @@ prod对应生产环境，qa对应测试环境。
 }
 ```
 ## 整理依赖
-把package.json里，dependencies里的依赖移到devDependencies里，服务端依赖除外。  
+把`package.json`里，`dependencies`里的依赖移到`devDependencie`s里，服务端依赖除外。  
 ## 与运维对接创建发布流程
-### 配置publicPath
-需要运维提供cos绑定的域名或者腾讯提供的免费域名，写入serverless/config.js的`publicPath`。
+### 配置 publicPath
+需要运维提供cos绑定的域名或者腾讯提供的免费域名，写入`serverless/config.js`的`publicPath`。
 ### 需要运维配置
 1. 选择serverless专用的docker
 2. 确定触发的tag前缀
@@ -44,7 +44,7 @@ prod对应生产环境，qa对应测试环境。
 TENCENT_SECRET_ID=aaa
 TENCENT_SECRET_KEY=bbb
 ```
-4. 需要在项目根目录生成serverless.yml文件,`$`开头的值需要运维修改
+4. 需要在项目根目录生成`serverless.yml`文件,`$`开头的值需要运维修改
 ```yml
 name: $name
 koot-csr:
