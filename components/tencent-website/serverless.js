@@ -44,10 +44,12 @@ class Website extends Component {
             Prefix: prefix
           })
           oldVers = res.Contents
+          console.log(res)
         } catch (e) {
           throw e
         }
         // 删除旧版本
+        console.log(prefix,oldVers)
         if (oldVers.length > keepVersion) {
           handler = util.promisify(cos.deleteObject.bind(cos))
           const arr = oldVers
