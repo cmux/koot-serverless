@@ -1,6 +1,6 @@
 {
   "name": "koot-tencent-koa",
-  "version": "1.0.2",
+  "version": "2.0.0",
   "description": "Tencent Koa Component",
   "repository": "serverless-components/tencent-koa",
   "keywords": [
@@ -14,15 +14,7 @@
   "main": "serverless.js",
   "dependencies": {
     "@serverless/core": "^1.1.2",
-    "@serverless/tencent-apigateway": "^2.1.4",
-    "koot-tencent-scf": "^1.0.0",
-    "ext": "^1.4.0",
-    "fs-extra": "^8.1.0",
-    "prettier": "^1.19.1",
-    "tencent-serverless-http": "^1.0.5",
-    "terser": "^4.4.2",
-    "type": "^2.0.0",
-    "webmake": "^1.1.0"
+    "@serverless/tencent-koa": "^3.0.1"
   },
   "devDependencies": {
     "@commitlint/cli": "^8.2.0",
@@ -34,7 +26,7 @@
     "github-release-from-cc-changelog": "^2.2.0",
     "husky": "^3.1.0",
     "lint-staged": "^9.5.0",
-    "minimist": "^1.2.0",
+    "prettier": "^1.19.1",
     "standard-version": "^7.0.1",
     "tape": "^4.11.0"
   },
