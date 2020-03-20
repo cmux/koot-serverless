@@ -1,7 +1,7 @@
 {
   "name": "@daqi/tencent-website",
   "description": "Tencent Serverless Static Website",
-  "version": "2.18.3",
+  "version": "3.0.7",
   "main": "./serverless.js",
   "publishConfig": {
     "access": "public"

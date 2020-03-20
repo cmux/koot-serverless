@@ -33,36 +33,66 @@ class Website extends Component {
       const match = dir ? dir.match(/(.+?)[\d\-_.|:]+$/) : null
       const prefix = match ? match[1] : null
       if (prefix) {
-        let handler
+        const getBucket = util.promisify(cos.getBucket.bind(cos))
+        const deleteObject = util.promisify(cos.deleteObject.bind(cos))
         let oldVers = []
         // 查找旧版本
         try {
-          handler = util.promisify(cos.getBucket.bind(cos))
-          const res = await handler({
+          const res = await getBucket({
             Bucket: inputs.bucketName,
             Region: inputs.region,
-            Prefix: prefix
+            Prefix: prefix,
+            Delimiter: '/'
           })
-          oldVers = res.Contents
-          console.log(res)
+          const dirArr = res.CommonPrefixes
+          const objectInfo = await Promise.all(
+            dirArr.map(({ Prefix }) => {
+              return getBucket({
+                Bucket: inputs.bucketName,
+                Region: inputs.region,
+                Prefix: Prefix,
+                MaxKeys: 1
+              })
+            })
+          )
+          oldVers = objectInfo.map((el, i) => {
+            return {
+              Prefix: dirArr[i].Prefix,
+              LastModified: el.Contents[0].LastModified
+            }
+          })
+          // console.log(res)
         } catch (e) {
           throw e
         }
         // 删除旧版本
-        console.log(prefix,oldVers)
         if (oldVers.length > keepVersion) {
-          handler = util.promisify(cos.deleteObject.bind(cos))
-          const arr = oldVers
-            .sort((fst, snd) => {
-              return new Date(fst.LastModified) - new Date(snd.LastModified)
-            })
-            .slice(0, oldVers.length - keepVersion)
-          for (const oldVer of arr) {
-            await handler({
-              Bucket: inputs.bucketName,
-              Region: inputs.region,
-              Key: oldVer.Key
-            })
+          try {
+            const deleteDirArr = oldVers
+              .sort((fst, snd) => {
+                return new Date(fst.LastModified) - new Date(snd.LastModified)
+              })
+              .slice(0, oldVers.length - keepVersion)
+            await Promise.all(
+              deleteDirArr.map(async (deleteDir) => {
+                const res = await getBucket({
+                  Bucket: inputs.bucketName,
+                  Region: inputs.region,
+                  Prefix: deleteDir.Prefix
+                })
+                await Promise.all(
+                  res.Contents.map((deleteObj) => {
+                    return deleteObject({
+                      Bucket: inputs.bucketName,
+                      Region: inputs.region,
+                      Key: deleteObj.Key
+                    })
+                  })
+                )
+              })
+            )
+          } catch (e) {
+            throw e
           }
         }
       }
