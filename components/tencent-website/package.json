@@ -1,7 +1,7 @@
 {
-  "name": "@daqi/tencent-website",
+  "name": "koot-tencent-website",
   "description": "Tencent Serverless Static Website",
-  "version": "2.18.3",
+  "version": "2.0.4",
   "main": "./serverless.js",
   "publishConfig": {
     "access": "public"
