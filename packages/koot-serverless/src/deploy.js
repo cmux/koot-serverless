@@ -64,7 +64,7 @@ const deploy = async () => {
         slsLogDeploy('Merge options from "serverless.tpl.yml"');
         const tplOptions = yaml.safeLoad(fs.readFileSync(tplPath, 'utf8'));
         const mergefn = (objValue, srcValue) => {
-            if (objValue === '__NEED_REPLACE__') {
+            if (!objValue || objValue === '__NEED_REPLACE__') {
                 return srcValue;
             }
             if (_.isArray(objValue)) {
