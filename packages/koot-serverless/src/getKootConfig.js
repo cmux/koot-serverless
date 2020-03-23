@@ -35,7 +35,7 @@ function getKootConfig(kootConfig) {
     const nextKootConfig = {
         ...kootConfig,
         serverless: true,
-        bundleVersionsKeep: false,
+        // bundleVersionsKeep: false,
         exportGzip: false,
         dist: path.join('./serverless', code, 'server')
     };
@@ -45,16 +45,15 @@ function getKootConfig(kootConfig) {
     const relativePath = `${name}_${version}`;
     const _publicPath = `${publicPath.replace(/\/$/, '')}/${relativePath}`;
 
+    if (!nextKootConfig.defines) nextKootConfig.defines = {};
+    nextKootConfig.defines.__PUBLIC_PATH__ = JSON.stringify(_publicPath);
+
     const oldWebpackConfig = kootConfig.webpackConfig;
     nextKootConfig.webpackConfig = async () => {
         let nextWebpackConfig = oldWebpackConfig || {};
         if (typeof oldWebpackConfig === 'function') {
             nextWebpackConfig = (await oldWebpackConfig()) || {};
         }
-        if (!nextKootConfig.defines) {
-            nextKootConfig.defines = {};
-        }
-        nextKootConfig.defines.__PUBLIC_PATH__ = JSON.stringify(_publicPath);
         nextWebpackConfig.output = {
             ...(nextWebpackConfig.output || {}),
             publicPath: _publicPath
