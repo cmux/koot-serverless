@@ -1,21 +1,18 @@
 # https://github.com/serverless-components/tencent-website/blob/master/docs/configure.md  
 # https://github.com/serverless-components/tencent-koa/blob/master/docs/configure.md
 
-name: appName
+name: __NEED_REPLACE__
 koot-csr:
-    component: koot-tencent-website
+    component: __NEED_REPLACE__
     inputs:
         code:
             root: __NEED_REPLACE__
         region: __NEED_REPLACE__
         bucketName: __NEED_REPLACE__
 koot-ssr:
-    component: koot-tencent-koa
+    component: __NEED_REPLACE__
     inputs:
         code: __NEED_REPLACE__
         region: __NEED_REPLACE__
         functionName: __NEED_REPLACE__
         serviceId: __NEED_REPLACE__
-        functionConf:
-            timeout: 10
-            memorySize: 256
