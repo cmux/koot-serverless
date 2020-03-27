@@ -4,8 +4,8 @@ const app = new Koa();
 const createRedirectMiddleware = require('./middlewares/createRedirectMiddleware');
 const createProxyMiddleware = require('./middlewares/createProxyMiddleware');
 
-const redirectOptions = require('./options/redirect.option');
-const proxyOptions = require('./options/proxy.option');
+const redirectOptions = require('./options/redirect.opt');
+const proxyOptions = require('./options/proxy.opt');
 
 app.use(createRedirectMiddleware(redirectOptions));
 
