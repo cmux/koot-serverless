@@ -1,7 +1,7 @@
 {
-    "name": "koot-serverless",
-    "version": "1.0.2",
-    "description": "koot-serverless",
+    "name": "koot-sentry",
+    "version": "1.0.0",
+    "description": "koot-sentry",
     "main": "src/index.js",
     "sideEffects": false,
     "repository": {
@@ -24,7 +24,6 @@
     },
     "dependencies": {
         "fs-extra": "*",
-        "js-yaml": "*",
-        "lodash": "*"
+        "@sentry/browser": "*"
     }
 }
