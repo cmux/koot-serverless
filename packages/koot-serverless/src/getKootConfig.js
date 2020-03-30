@@ -47,6 +47,7 @@ function getKootConfig(kootConfig) {
 
     if (!nextKootConfig.defines) nextKootConfig.defines = {};
     nextKootConfig.defines.__PUBLIC_PATH__ = JSON.stringify(_publicPath);
+    nextKootConfig.defines.__VERSION__ = JSON.stringify(version);
 
     const oldWebpackConfig = kootConfig.webpackConfig;
     nextKootConfig.webpackConfig = async () => {
