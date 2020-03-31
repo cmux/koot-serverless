@@ -19,6 +19,7 @@ function getKootConfig(kootConfig, { dsn }) {
 
     const template = `
 const Sentry = require('@sentry/browser');
+
 Sentry.init({
     release: '${release}',
     dsn: '${dsn}'
@@ -38,7 +39,17 @@ Sentry.init({
         if (typeof oldWebpackConfig === 'function') {
             nextWebpackConfig = (await oldWebpackConfig()) || {};
         }
-        nextWebpackConfig.entry.sentry = sentryFile;
+        const critical = nextWebpackConfig.entry.critical;
+        if (critical) {
+            if (Array.isArray(critical)) {
+                nextWebpackConfig.entry.critical.push(sentryFile);
+            }
+            if (typeof critical === 'string') {
+                nextWebpackConfig.entry.critical = [critical, sentryFile];
+            }
+        } else {
+            nextWebpackConfig.entry.critical = [sentryFile];
+        }
         nextWebpackConfig.devtool = 'source-map';
         return nextWebpackConfig;
     };
