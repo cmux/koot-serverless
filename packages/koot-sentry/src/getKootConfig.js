@@ -24,6 +24,8 @@ Sentry.init({
     release: '${release}',
     dsn: '${dsn}'
 });
+
+window.__SentryTest = () => Sentry.captureException(new Error('Sentry Test!'));
 `;
 
     const sentryFile = path.join(rootPath, 'src/sentry.js');
