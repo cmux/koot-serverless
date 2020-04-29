@@ -105,6 +105,10 @@ function getKootConfig(kootConfig) {
             slsLogBuild('create app.js for serverless');
             const appContent = 'module.exports = require("./server").default;';
             fs.outputFileSync(path.join(distPath, 'app.js'), appContent);
+            // 生成 index.js
+            slsLogBuild('create index.js for test');
+            const indexContent = 'require("./server").default.listen(8234,()=>{console.log("http://127.0.0.1:8234")});';
+            fs.outputFileSync(path.join(distPath, 'index.js'), indexContent);
             // 复制 publicCode
             const publicCodePath = path.join(distPath, '../public');
             const csrPathx = path.join(publicCodePath, relativePath);
