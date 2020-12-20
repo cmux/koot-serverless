@@ -17,15 +17,16 @@ function getKootConfig(kootConfig, { dsn }) {
     const name = require(path.join(rootPath, './package.json')).name;
     const release = `${name}@${version}`;
 
-    const template = `
-const Sentry = require('@sentry/browser');
+    const template = `const isWindow = typeof window !== 'undefined';
 
-Sentry.init({
-    release: '${release}',
-    dsn: '${dsn}'
-});
-
-window.__SentryTest = () => Sentry.captureException(new Error('Sentry Test!'));
+if(isWindow){
+    const Sentry = require('@sentry/browser');
+    Sentry.init({
+        release: '${release}',
+        dsn: '${sentryOptions.dsn}'
+    });
+    window.__SentryTest = () => Sentry.captureException(new Error('Sentry Test!'));
+}
 `;
 
     const sentryFile = path.join(rootPath, 'src/sentry.js');
@@ -35,22 +36,13 @@ window.__SentryTest = () => Sentry.captureException(new Error('Sentry Test!'));
         ...kootConfig
     };
 
+    nextKootConfig.before = sentryFile
+
     const oldWebpackConfig = nextKootConfig.webpackConfig;
     nextKootConfig.webpackConfig = async () => {
         let nextWebpackConfig = oldWebpackConfig || {};
         if (typeof oldWebpackConfig === 'function') {
             nextWebpackConfig = (await oldWebpackConfig()) || {};
-        }
-        const critical = nextWebpackConfig.entry.critical;
-        if (critical) {
-            if (Array.isArray(critical)) {
-                nextWebpackConfig.entry.critical.push(sentryFile);
-            }
-            if (typeof critical === 'string') {
-                nextWebpackConfig.entry.critical = [critical, sentryFile];
-            }
-        } else {
-            nextWebpackConfig.entry.critical = [sentryFile];
         }
         nextWebpackConfig.devtool = 'source-map';
         return nextWebpackConfig;
