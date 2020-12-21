@@ -2,7 +2,7 @@ const fs = require('fs-extra');
 const path = require('path');
 const { getVersion, spawn } = require('./utils');
 
-const target = process.env.target;
+const target = process.env.target || process.env.WEBPACK_BUILD_ENV || 'prod';
 const rootPath = process.cwd();
 
 /**
