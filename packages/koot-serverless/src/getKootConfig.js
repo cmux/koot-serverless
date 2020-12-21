@@ -37,7 +37,7 @@ function getKootConfig(kootConfig) {
         serverless: true,
         // bundleVersionsKeep: false,
         exportGzip: false,
-        dist: path.join('./serverless', code, 'server')
+        dist: path.join('./serverless', code, 'server'),
     };
 
     const version = getVersion('release_' + target);
@@ -57,17 +57,17 @@ function getKootConfig(kootConfig) {
         }
         nextWebpackConfig.output = {
             ...(nextWebpackConfig.output || {}),
-            publicPath: _publicPath
+            publicPath: _publicPath,
         };
         return nextWebpackConfig;
     };
 
     const oldWebpackBefore = kootConfig.webpackBefore;
-    nextKootConfig.webpackBefore = async kootConfigWithExtra => {
+    nextKootConfig.webpackBefore = async (kootConfigWithExtra) => {
         if (oldWebpackBefore) await oldWebpackBefore(kootConfigWithExtra);
         const {
             __WEBPACK_OUTPUT_PATH,
-            __CLIENT_ROOT_PATH
+            __CLIENT_ROOT_PATH,
         } = kootConfigWithExtra;
         if (__CLIENT_ROOT_PATH) {
             fs.emptyDirSync(__CLIENT_ROOT_PATH);
@@ -77,11 +77,11 @@ function getKootConfig(kootConfig) {
     };
 
     const oldWebpackAfter = kootConfig.webpackAfter;
-    nextKootConfig.webpackAfter = async kootConfigWithExtra => {
+    nextKootConfig.webpackAfter = async (kootConfigWithExtra) => {
         if (oldWebpackAfter) await oldWebpackAfter(kootConfigWithExtra);
         const {
             __WEBPACK_OUTPUT_PATH,
-            __CLIENT_ROOT_PATH
+            __CLIENT_ROOT_PATH,
         } = kootConfigWithExtra;
         // 整理文件夹
         if (!__CLIENT_ROOT_PATH && __WEBPACK_OUTPUT_PATH) {
@@ -90,11 +90,11 @@ function getKootConfig(kootConfig) {
 
             // 移动lock文件
             slsLogBuild('move lock file');
-            ['yarn.lock', 'package-lock.json'].forEach(filename => {
+            ['yarn.lock', 'package-lock.json'].forEach((filename) => {
                 const filePath = path.resolve(rootPath, filename);
                 if (fs.pathExistsSync(filePath)) {
                     fs.copySync(filePath, path.join(distPath, filename), {
-                        overwrite: true
+                        overwrite: true,
                     });
                 }
             });
@@ -107,7 +107,8 @@ function getKootConfig(kootConfig) {
             fs.outputFileSync(path.join(distPath, 'app.js'), appContent);
             // 生成 index.js
             slsLogBuild('create index.js for test');
-            const indexContent = 'require("./server").default.listen(8234,()=>{console.log("http://127.0.0.1:8234")});';
+            const indexContent =
+                'require("./server").default.listen(8234,()=>{console.log("http://127.0.0.1:8234")});';
             fs.outputFileSync(path.join(distPath, 'index.js'), indexContent);
             // 复制 publicCode
             const publicCodePath = path.join(distPath, '../public');
@@ -115,6 +116,7 @@ function getKootConfig(kootConfig) {
             slsLogBuild(`copy public to ${csrPathx}`);
             fs.emptyDirSync(publicCodePath);
             fs.copySync(path.join(distPath, 'public'), csrPathx);
+            nextKootConfig.defines.__RELATIVE_PATH__ = JSON.stringify(publicCodePath);
         }
     };
 

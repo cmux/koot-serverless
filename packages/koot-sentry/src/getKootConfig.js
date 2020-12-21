@@ -33,10 +33,10 @@ if(isWindow){
     fs.outputFileSync(sentryFile, template);
 
     const nextKootConfig = {
-        ...kootConfig
+        ...kootConfig,
     };
 
-    nextKootConfig.before = sentryFile
+    nextKootConfig.before = sentryFile;
 
     const oldWebpackConfig = nextKootConfig.webpackConfig;
     nextKootConfig.webpackConfig = async () => {
@@ -49,16 +49,18 @@ if(isWindow){
     };
 
     const oldWebpackAfter = kootConfig.webpackAfter;
-    nextKootConfig.webpackAfter = async kootConfigWithExtra => {
+    nextKootConfig.webpackAfter = async (kootConfigWithExtra) => {
         if (oldWebpackAfter) await oldWebpackAfter(kootConfigWithExtra);
         const {
             __WEBPACK_OUTPUT_PATH,
-            __CLIENT_ROOT_PATH
+            __CLIENT_ROOT_PATH,
         } = kootConfigWithExtra;
         // 发布
         if (!__CLIENT_ROOT_PATH && __WEBPACK_OUTPUT_PATH) {
             const serverPath = __WEBPACK_OUTPUT_PATH;
-            const pubilcPath = path.join(serverPath, '../public');
+            const pubilcPath = kootConfig.defines.__RELATIVE_PATH__
+                ? JSON.parse(kootConfig.defines.__RELATIVE_PATH__)
+                : path.join(serverPath, '../public');
             await spawn(
                 `sentry-cli releases files "${release}" upload-sourcemaps ${pubilcPath} --rewrite`
             );
