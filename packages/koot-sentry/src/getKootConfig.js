@@ -51,18 +51,36 @@ if(isWindow){
     const oldWebpackAfter = kootConfig.webpackAfter;
     nextKootConfig.webpackAfter = async (kootConfigWithExtra) => {
         if (oldWebpackAfter) await oldWebpackAfter(kootConfigWithExtra);
-        const {
-            __WEBPACK_OUTPUT_PATH,
-            __CLIENT_ROOT_PATH,
-        } = kootConfigWithExtra;
+        const { __WEBPACK_OUTPUT_PATH, __CLIENT_ROOT_PATH } = kootConfigWithExtra;
         // 发布
         if (!__CLIENT_ROOT_PATH && __WEBPACK_OUTPUT_PATH) {
             const serverPath = __WEBPACK_OUTPUT_PATH;
-            const pubilcPath = kootConfig.defines.__RELATIVE_PATH__
+            const distPath = path.join(serverPath, '..');
+            let realPublicPath;
+            ['.public-chunkmap.json', '.koot-public-manifest.json'].forEach((filename) => {
+                const jsonFilePath = path.resolve(distPath, filename);
+                if (fs.pathExistsSync(jsonFilePath)) {
+                    const json = fs.readJSONSync(jsonFilePath);
+                    if (json['.public']) {
+                        realPublicPath = path.join(distPath, json['.public']);
+                    } else {
+                        for (var key in json) {
+                            if (json[key]['.public'])
+                                realPublicPath = path.join(distPath, json[key]['.public']);
+                            break;
+                        }
+                    }
+                }
+            });
+
+            const definePublicPath = kootConfig.defines.__RELATIVE_PATH__
                 ? JSON.parse(kootConfig.defines.__RELATIVE_PATH__)
-                : path.join(serverPath, '../public');
+                : null;
+
+            const publicPath = definePublicPath || realPublicPath || path.join(distPath, 'public');
+
             await spawn(
-                `sentry-cli releases files "${release}" upload-sourcemaps ${pubilcPath} --rewrite`
+                `sentry-cli releases files "${release}" upload-sourcemaps ${publicPath} --rewrite`
             );
         }
     };
