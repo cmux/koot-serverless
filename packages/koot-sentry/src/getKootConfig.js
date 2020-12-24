@@ -10,6 +10,7 @@ const rootPath = process.cwd();
  * @param {*} kootConfig
  */
 function getKootConfig(kootConfig, sentryOptions) {
+    kootConfig.defines = kootConfig.defines || {}
     const version = kootConfig.defines.__VERSION__
         ? JSON.parse(kootConfig.defines.__VERSION__)
         : getVersion('release_' + target);
