@@ -37,27 +37,52 @@ if(isWindow){
         ...kootConfig,
     };
 
-    nextKootConfig.before = sentryFile;
+    try {
+        nextKootConfig.client.before = sentryFile;
+    } catch(e) {
+        nextKootConfig.before = sentryFile;
+    }
 
-    const oldWebpackConfig = nextKootConfig.webpackConfig;
-    nextKootConfig.webpackConfig = async () => {
+    const isOldWebpackConfigMethod = typeof nextKootConfig.webpack === 'object'
+
+    const oldWebpackConfig = isOldWebpackConfigMethod
+        ? nextKootConfig.webpack.config
+        : nextKootConfig.webpackConfig;
+    const newWebpackConfig = async () => {
         let nextWebpackConfig = oldWebpackConfig || {};
         if (typeof oldWebpackConfig === 'function') {
             nextWebpackConfig = (await oldWebpackConfig()) || {};
         }
-        nextWebpackConfig.devtool = 'source-map';
+        nextWebpackConfig.devtool = 'hidden-source-map';
+        // nextWebpackConfig.devtool = 'hidden-cheap-module-source-map';
         return nextWebpackConfig;
     };
+    if (isOldWebpackConfigMethod) {
+        nextKootConfig.webpack.config = newWebpackConfig
+    } else {
+        nextKootConfig.webpackConfig = newWebpackConfig
+    }
 
-    const oldWebpackAfter = kootConfig.webpackAfter;
-    nextKootConfig.webpackAfter = async (kootConfigWithExtra) => {
+    const oldWebpackAfter = isOldWebpackConfigMethod
+        ? nextKootConfig.webpack.afterBuild
+        : kootConfig.webpackAfter;
+    const newWebpackAfter = async (kootConfigWithExtra) => {
         if (oldWebpackAfter) await oldWebpackAfter(kootConfigWithExtra);
         const { __WEBPACK_OUTPUT_PATH, __CLIENT_ROOT_PATH } = kootConfigWithExtra;
+
+        const needPublish = !process.env.KOOT_SENTRY_PUBLISHED && (
+            (
+                process.env.WEBPACK_BUILD_TYPE === 'spa' && !!__CLIENT_ROOT_PATH
+            ) || (
+                !__CLIENT_ROOT_PATH && __WEBPACK_OUTPUT_PATH
+            )
+        )
+
         // 发布
-        if (!__CLIENT_ROOT_PATH && __WEBPACK_OUTPUT_PATH) {
+        if (needPublish) {
             const serverPath = __WEBPACK_OUTPUT_PATH;
             const distPath = path.join(serverPath, '..');
-            let realPublicPath;
+            let realPublicPath = __CLIENT_ROOT_PATH;
             ['.public-chunkmap.json', '.koot-public-manifest.json'].forEach((filename) => {
                 const jsonFilePath = path.resolve(distPath, filename);
                 if (fs.pathExistsSync(jsonFilePath)) {
@@ -83,8 +108,16 @@ if(isWindow){
             await spawn(
                 `sentry-cli releases files "${release}" upload-sourcemaps ${publicPath} --rewrite`
             );
+
+            process.env.KOOT_SENTRY_PUBLISHED = true
         }
     };
+    if (isOldWebpackConfigMethod) {
+        nextKootConfig.webpack.afterBuild = newWebpackAfter
+    } else {
+        nextKootConfig.webpackAfter = newWebpackAfter
+    }
+
     return nextKootConfig;
 }
 
