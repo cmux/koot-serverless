@@ -37,20 +37,36 @@ if(isWindow){
         ...kootConfig,
     };
 
-    nextKootConfig.before = sentryFile;
+    try {
+        nextKootConfig.client.before = sentryFile;
+    } catch(e) {
+        nextKootConfig.before = sentryFile;
+    }
 
-    const oldWebpackConfig = nextKootConfig.webpackConfig;
-    nextKootConfig.webpackConfig = async () => {
+    const isOldWebpackConfigMethod = typeof nextKootConfig.webpack === 'object'
+
+    const oldWebpackConfig = isOldWebpackConfigMethod
+        ? nextKootConfig.webpack.config
+        : nextKootConfig.webpackConfig;
+    const newWebpackConfig = async () => {
         let nextWebpackConfig = oldWebpackConfig || {};
         if (typeof oldWebpackConfig === 'function') {
             nextWebpackConfig = (await oldWebpackConfig()) || {};
         }
-        nextWebpackConfig.devtool = 'source-map';
+        nextWebpackConfig.devtool = 'hidden-source-map';
+        // nextWebpackConfig.devtool = 'hidden-cheap-module-source-map';
         return nextWebpackConfig;
     };
+    if (nextKootConfig.webpackConfig) {
+        nextKootConfig.webpack.config = newWebpackConfig
+    } else {
+        nextKootConfig.webpackConfig = newWebpackConfig
+    }
 
-    const oldWebpackAfter = kootConfig.webpackAfter;
-    nextKootConfig.webpackAfter = async (kootConfigWithExtra) => {
+    const oldWebpackAfter = isOldWebpackConfigMethod
+        ? nextKootConfig.webpack.afterBuild
+        : kootConfig.webpackAfter;
+    const newWebpackAfter = async (kootConfigWithExtra) => {
         if (oldWebpackAfter) await oldWebpackAfter(kootConfigWithExtra);
         const { __WEBPACK_OUTPUT_PATH, __CLIENT_ROOT_PATH } = kootConfigWithExtra;
         // 发布
@@ -85,6 +101,12 @@ if(isWindow){
             );
         }
     };
+    if (nextKootConfig.webpackConfig) {
+        nextKootConfig.webpack.afterBuild = newWebpackAfter
+    } else {
+        nextKootConfig.webpackAfter = newWebpackAfter
+    }
+
     return nextKootConfig;
 }
 
