@@ -57,7 +57,7 @@ if(isWindow){
         // nextWebpackConfig.devtool = 'hidden-cheap-module-source-map';
         return nextWebpackConfig;
     };
-    if (nextKootConfig.webpackConfig) {
+    if (isOldWebpackConfigMethod) {
         nextKootConfig.webpack.config = newWebpackConfig
     } else {
         nextKootConfig.webpackConfig = newWebpackConfig
@@ -69,11 +69,20 @@ if(isWindow){
     const newWebpackAfter = async (kootConfigWithExtra) => {
         if (oldWebpackAfter) await oldWebpackAfter(kootConfigWithExtra);
         const { __WEBPACK_OUTPUT_PATH, __CLIENT_ROOT_PATH } = kootConfigWithExtra;
+
+        const needPublish = !process.env.KOOT_SENTRY_PUBLISHED && (
+            (
+                process.env.WEBPACK_BUILD_TYPE === 'spa' && !!__CLIENT_ROOT_PATH
+            ) || (
+                !__CLIENT_ROOT_PATH && __WEBPACK_OUTPUT_PATH
+            )
+        )
+
         // 发布
-        if (!__CLIENT_ROOT_PATH && __WEBPACK_OUTPUT_PATH) {
+        if (needPublish) {
             const serverPath = __WEBPACK_OUTPUT_PATH;
             const distPath = path.join(serverPath, '..');
-            let realPublicPath;
+            let realPublicPath = __CLIENT_ROOT_PATH;
             ['.public-chunkmap.json', '.koot-public-manifest.json'].forEach((filename) => {
                 const jsonFilePath = path.resolve(distPath, filename);
                 if (fs.pathExistsSync(jsonFilePath)) {
@@ -99,9 +108,11 @@ if(isWindow){
             await spawn(
                 `sentry-cli releases files "${release}" upload-sourcemaps ${publicPath} --rewrite`
             );
+
+            process.env.KOOT_SENTRY_PUBLISHED = true
         }
     };
-    if (nextKootConfig.webpackConfig) {
+    if (isOldWebpackConfigMethod) {
         nextKootConfig.webpack.afterBuild = newWebpackAfter
     } else {
         nextKootConfig.webpackAfter = newWebpackAfter
