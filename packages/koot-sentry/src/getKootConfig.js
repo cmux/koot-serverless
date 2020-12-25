@@ -10,7 +10,7 @@ const rootPath = process.cwd();
  * @param {*} kootConfig
  */
 function getKootConfig(kootConfig, sentryOptions) {
-    kootConfig.defines = kootConfig.defines || {}
+    kootConfig.defines = kootConfig.defines || {};
     const version = kootConfig.defines.__VERSION__
         ? JSON.parse(kootConfig.defines.__VERSION__)
         : getVersion('release_' + target);
@@ -39,11 +39,11 @@ if(isWindow){
 
     try {
         nextKootConfig.client.before = sentryFile;
-    } catch(e) {
+    } catch (e) {
         nextKootConfig.before = sentryFile;
     }
 
-    const isOldWebpackConfigMethod = typeof nextKootConfig.webpack === 'object'
+    const isOldWebpackConfigMethod = typeof nextKootConfig.webpack === 'object';
 
     const oldWebpackConfig = isOldWebpackConfigMethod
         ? nextKootConfig.webpack.config
@@ -58,9 +58,9 @@ if(isWindow){
         return nextWebpackConfig;
     };
     if (isOldWebpackConfigMethod) {
-        nextKootConfig.webpack.config = newWebpackConfig
+        nextKootConfig.webpack.config = newWebpackConfig;
     } else {
-        nextKootConfig.webpackConfig = newWebpackConfig
+        nextKootConfig.webpackConfig = newWebpackConfig;
     }
 
     const oldWebpackAfter = isOldWebpackConfigMethod
@@ -70,13 +70,11 @@ if(isWindow){
         if (oldWebpackAfter) await oldWebpackAfter(kootConfigWithExtra);
         const { __WEBPACK_OUTPUT_PATH, __CLIENT_ROOT_PATH } = kootConfigWithExtra;
 
-        const needPublish = !process.env.KOOT_SENTRY_PUBLISHED && (
-            (
-                process.env.WEBPACK_BUILD_TYPE === 'spa' && !!__CLIENT_ROOT_PATH
-            ) || (
-                !__CLIENT_ROOT_PATH && __WEBPACK_OUTPUT_PATH
-            )
-        )
+        if (process.env.KOOT_SENTRY_PUBLISHED) return;
+
+        const needPublish =
+            (process.env.WEBPACK_BUILD_TYPE === 'spa' && !!__CLIENT_ROOT_PATH) || // spa
+            (!__CLIENT_ROOT_PATH && __WEBPACK_OUTPUT_PATH); // ssr
 
         // 发布
         if (needPublish) {
@@ -109,13 +107,13 @@ if(isWindow){
                 `sentry-cli releases files "${release}" upload-sourcemaps ${publicPath} --rewrite`
             );
 
-            process.env.KOOT_SENTRY_PUBLISHED = true
+            process.env.KOOT_SENTRY_PUBLISHED = true;
         }
     };
     if (isOldWebpackConfigMethod) {
-        nextKootConfig.webpack.afterBuild = newWebpackAfter
+        nextKootConfig.webpack.afterBuild = newWebpackAfter;
     } else {
-        nextKootConfig.webpackAfter = newWebpackAfter
+        nextKootConfig.webpackAfter = newWebpackAfter;
     }
 
     return nextKootConfig;
