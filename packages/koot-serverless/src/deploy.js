@@ -52,7 +52,7 @@ const deploy = async () => {
             `"serverless.yml" or "serverless.${target}.yml" could not be found!`
         );
     }
-    let slsOptions = yaml.safeLoad(
+    let slsOptions = yaml.load(
         fs.readFileSync(
             fs.pathExistsSync(targetYmlPath) ? targetYmlPath : ymlPath,
             'utf8'
@@ -62,7 +62,7 @@ const deploy = async () => {
     if (fs.pathExistsSync(tplPath)) {
         // console.log(slsOptions)
         slsLogDeploy('Merge options from "serverless.tpl.yml"');
-        const tplOptions = yaml.safeLoad(fs.readFileSync(tplPath, 'utf8'));
+        const tplOptions = yaml.load(fs.readFileSync(tplPath, 'utf8'));
         const mergefn = (objValue, srcValue) => {
             if (!objValue || objValue === '__NEED_REPLACE__') {
                 return srcValue;
@@ -82,7 +82,7 @@ const deploy = async () => {
     slsOptions['koot-csr'].inputs.code.root = publicPath;
     slsOptions['koot-ssr'].inputs.code = serverPath;
 
-    const slsYamlContent = yaml.safeDump(slsOptions, { indent: 4 });
+    const slsYamlContent = yaml.dump(slsOptions, { indent: 4 });
     fs.outputFileSync(path.join(distPath, 'serverless.yml'), slsYamlContent);
     // sls发布
     slsLogDeploy('serverless deploy begin!');
