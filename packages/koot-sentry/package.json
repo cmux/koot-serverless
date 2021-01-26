@@ -1,6 +1,6 @@
 {
     "name": "koot-sentry",
-    "version": "1.0.10",
+    "version": "1.0.11",
     "description": "koot-sentry",
     "main": "src/index.js",
     "sideEffects": false,

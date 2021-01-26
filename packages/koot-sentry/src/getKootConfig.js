@@ -24,7 +24,48 @@ if(isWindow){
     const Sentry = require('@sentry/browser');
     Sentry.init({
         release: '${release}',
-        dsn: '${sentryOptions.dsn}'
+        dsn: '${sentryOptions.dsn}',
+        ignoreErrors: [
+            "anonymous",
+            "Anonymous",
+            "ChunkLoadError",
+            "UnhandledRejection",
+            "SyntaxError",
+            "Syntax error",
+            "Failed to fetch",
+            "Network Error",
+            "getCss3offsetLeft",
+            "Loading CSS chunk",
+            "ResizeObserver loop",
+            "serviceWorker",
+            "NotAllowedError",
+            "SecurityError",
+            "Can't find variable",
+            "toDataURL",
+            "promiseReactionJob",
+            "postMessage",
+            "AbortError",
+            "history is undefined",
+            "_VideoEnabledWebView",
+            "'Map' is undefined",
+            "'$' is undefined",
+            "debug is not a function",
+            "UC_NEWS_PAUSE_ALL_VIDEOS",
+            "MyAppGetLinkTitleNameAtPoint",
+            "querySelectorAll",
+        ],
+        denyUrls: [
+            /extension:\\/\\//i,
+            /^chrome:\\/\\//i,
+            /127\\.0\\.0\\.1.*/i,
+            /localhost.*/i,
+            /\\.baidu\\.com\\//i,
+            /\\.bdstatic\\.com\\//i,
+            /\\.23ak\\.cn\\//i,
+            /\\.bdstatic\\.com\\//i,
+            /\\.translate\\.goog\\//i,
+            /translate\\.googleusercontent\\.com\\//i,
+        ]
     });
     window.__SentryTest = () => Sentry.captureException(new Error('Sentry Test!'));
 }
