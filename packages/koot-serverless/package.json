@@ -1,6 +1,6 @@
 {
     "name": "koot-serverless",
-    "version": "1.0.7",
+    "version": "1.1.1",
     "description": "koot-serverless",
     "main": "src/index.js",
     "sideEffects": false,
@@ -20,11 +20,11 @@
         }
     ],
     "engines": {
-        "node": ">=8.9.0"
+        "node": ">=10.0.0"
     },
     "dependencies": {
-        "fs-extra": "*",
-        "js-yaml": "*",
-        "lodash": "*"
+        "fs-extra": "^9.1.0",
+        "js-yaml": "^4.1.0",
+        "lodash": "^4.17.21"
     }
 }
