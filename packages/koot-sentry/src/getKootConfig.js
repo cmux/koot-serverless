@@ -71,7 +71,7 @@ if(isWindow){
 }
 `;
 
-    const sentryFile = path.join(rootPath, 'src/sentry.js');
+    const sentryFile = path.resolve(__dirname, '../.app-sentry.js');
     fs.outputFileSync(sentryFile, template);
 
     const nextKootConfig = {
@@ -79,9 +79,9 @@ if(isWindow){
     };
 
     try {
-        nextKootConfig.client.before = sentryFile;
+        nextKootConfig.client.before = sentryFile.replace(/\\/g, '\\\\');
     } catch (e) {
-        nextKootConfig.before = sentryFile;
+        nextKootConfig.before = sentryFile.replace(/\\/g, '\\\\');
     }
 
     const isOldWebpackConfigMethod = typeof nextKootConfig.webpack === 'object';
@@ -129,7 +129,7 @@ if(isWindow){
                     if (json['.public']) {
                         realPublicPath = path.join(distPath, json['.public']);
                     } else {
-                        for (var key in json) {
+                        for (const key in json) {
                             if (json[key]['.public'])
                                 realPublicPath = path.join(distPath, json[key]['.public']);
                             break;

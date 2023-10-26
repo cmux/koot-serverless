@@ -1,0 +1,72 @@
+{
+    "name": "koot-extra",
+    "description": "Extra modules and packages for Koot.js",
+    "private": true,
+    "type": "module",
+    "scripts": {
+        "prepare": "husky install",
+        "commit": "npx cz-customizable",
+        "up": "npx npm-check-updates -i"
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/cmux/koot-serverless"
+    },
+    "author": {
+        "name": "dongwenxiao",
+        "email": "cs_victor@126.com"
+    },
+    "contributors": [
+        {
+            "name": "diablohu",
+            "email": "diablohudream@gmail.com",
+            "url": "https://diablohu.dev"
+        }
+    ],
+    "bugs": {
+        "url": "https://github.com/cmux/koot-serverless/issues"
+    },
+    "homepage": "https://github.com/cmux/koot-serverless",
+    "engines": {
+        "node": ">=18.8.0"
+    },
+    "license": "UNLICENSED",
+    "devDependencies": {
+        "@commitlint/cli": "^17.6.3",
+        "@commitlint/config-conventional": "^17.6.3",
+        "eslint": "^8.52.0",
+        "eslint-config-koot": "^4.0.0",
+        "husky": "^8.0.3",
+        "lint-staged": "^13.3.0",
+        "prettier": "^2.8.8",
+        "prettier-eslint": "^15.0.1",
+        "react": "^18.2.0"
+    },
+    "husky": {
+        "hooks": {
+            "commit-msg": "commitlint -E HUSKY_GIT_PARAMS",
+            "pre-commit": "lint-staged"
+        }
+    },
+    "lint-staged": {
+        "*.{js,jsx,cjs,mjs}": [
+            "eslint --fix",
+            "prettier --write"
+        ],
+        "*.{ts,tsx}": [
+            "eslint --fix",
+            "prettier --write"
+        ],
+        "*.{xxxxxx}": [
+            "tsc --noEmit"
+        ],
+        "*.{json,md,css,less,sass,scss}": [
+            "prettier --write"
+        ]
+    },
+    "config": {
+        "cz-customizable": {
+            "config": ".cz-config.cjs"
+        }
+    }
+}
