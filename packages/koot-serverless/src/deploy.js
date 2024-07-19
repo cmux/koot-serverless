@@ -4,7 +4,10 @@
  * 安装发布脚本依赖
  * 安装服务端环境依赖
  * 读取&修改 serverless.yml
- * 发布 sls --debug
+ * 发布 scf --debug
+ *
+ * [2024/07/19] UPDATE!
+ * - 由于腾讯云的变化，现在需要使用 `scf` 命令来发布
  */
 
 const path = require('path');
@@ -86,7 +89,7 @@ const deploy = async () => {
     fs.outputFileSync(path.join(distPath, 'serverless.yml'), slsYamlContent);
     // sls发布
     slsLogDeploy('serverless deploy begin!');
-    await spawn(`cd ${distPath} && sls --debug`);
+    await spawn(`cd ${distPath} && scf --debug`);
 };
 
 module.exports = deploy;

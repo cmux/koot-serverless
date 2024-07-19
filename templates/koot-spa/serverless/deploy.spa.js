@@ -2,24 +2,27 @@
  * 发布
  * 生成 .env
  * 生成 serverless.yml
- * 发布 sls --debug
+ * 发布 scf --debug
+ *
+ * [2024/07/19] UPDATE!
+ * - 由于腾讯云的变化，现在需要使用 `scf` 命令来发布
  */
 const fs = require('fs-extra');
 const path = require('path');
 
 const slsConfigs = require('./config');
 
-const slsLog = (...args) => console.log(`<sls:deploy>`, ...args);
+const slsLog = (...args) => console.log(`<scf:deploy>`, ...args);
 
 // 运行命令
-const spawn = async cmd => {
+const spawn = async (cmd) => {
     slsLog(`=> ${cmd}`);
     const chunks = cmd.split(' ');
-    await new Promise(resolve => {
+    await new Promise((resolve) => {
         const child = require('child_process').spawn(chunks.shift(), chunks, {
             stdio: 'inherit',
             shell: true,
-            cwd: __dirname
+            cwd: __dirname,
         });
         child.on('close', () => {
             resolve();
@@ -87,8 +90,8 @@ fs.outputFileSync(ymlPath, ymlContent);
 
 const run = async () => {
     // sls发布
-    slsLog('sls deploy');
-    await spawn(`cd ${slsPath} && sls --debug`);
+    slsLog('scf deploy');
+    await spawn(`cd ${slsPath} && scf --debug`);
 
     if (fs.pathExistsSync(websiteJsonPath)) {
         packageObj = fs.readJsonSync(websiteJsonPath);
