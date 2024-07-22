@@ -82,7 +82,9 @@ const deploy = async () => {
     }
 
     slsLogDeploy('Update "code" in "serverless.yml"');
-    slsOptions['koot-csr'].inputs.code.root = publicPath;
+    try{
+        slsOptions['koot-csr'].inputs.code.root = publicPath;
+    }catch(e){}
     slsOptions['koot-ssr'].inputs.code = serverPath;
 
     const slsYamlContent = yaml.dump(slsOptions, { indent: 4 });
