@@ -1,6 +1,6 @@
 {
     "name": "koot-serverless",
-    "version": "2.0.0",
+    "version": "2.0.1",
     "description": "koot-serverless",
     "main": "src/index.js",
     "sideEffects": false,
