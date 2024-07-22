@@ -87,6 +87,9 @@ const deploy = async () => {
 
     const slsYamlContent = yaml.dump(slsOptions, { indent: 4 });
     fs.outputFileSync(path.join(distPath, 'serverless.yml'), slsYamlContent);
+
+    console.log('YML', slsYamlContent)
+
     // sls发布
     slsLogDeploy('serverless deploy begin!');
     await spawn(`cd ${distPath} && scf --debug`);
