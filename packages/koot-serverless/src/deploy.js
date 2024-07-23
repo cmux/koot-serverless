@@ -94,7 +94,7 @@ const deploy = async () => {
 
     // sls发布
     slsLogDeploy('serverless deploy begin!');
-    await spawn(`cd ${distPath} && scf --debug`);
+    await spawn(`cd ${distPath} && scf deploy --debug`);
 };
 
 module.exports = deploy;
