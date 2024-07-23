@@ -12,16 +12,18 @@
  * 目录结构
  * 📂 项目根目录
  *  ├── 📂 serverless
- *  │    ├── 📂 dist                     打包结果
- *  │    │    ├── 📂 public              静态服务器，需上传到 `COS桶`
+ *  │    ├── 📂 dist                        打包结果
+ *  │    │    ├── 📂 public                 静态服务器，需上传到 `COS桶`
  *  │    │    │    └── 📂 [COS桶名称]
  *  │    │    │         └── 📄 [静态资源]...
- *  │    │    └── 📂 server              SSR服务器，需上传到 `Serverless`
- *  │    │         └── 📄 [SSR脚本 & 资源]...
- *  │    ├── 📄 config.js                静态目录配置
- *  │    ├── 📄 deploy.js                发布脚本，打包时自动生成，会调用并运行下面的 `deploy` 方法
- *  │    ├── 📄 koot.config.js           腾讯云 Serverless 相关设置
- *  │    └── 📄 package.json             安装 `koot-serverless` 包
+ *  │    │    ├── 📂 server                 SSR服务器，需上传到 `Serverless`
+ *  │    │    │    └── 📄 [SSR脚本 & 资源]...
+ *  │    │    ├── 📄 serverless_public.yml  **⚠运维提供⚠** 静态服务器上传配置
+ *  │    │    └── 📄 serverless_server.yml  **⚠运维提供⚠** SSR服务器上传配置
+ *  │    ├── 📄 config.js                   静态目录配置
+ *  │    ├── 📄 deploy.js                   发布脚本，打包时自动生成，会调用并运行下面的 `deploy` 方法
+ *  │    ├── 📄 koot.config.js              腾讯云 Serverless 相关设置
+ *  │    └── 📄 package.json                安装 `koot-serverless` 包
  *  └── 📄 [项目代码库]...
  */
 
@@ -73,55 +75,58 @@ const deploy = async () => {
     } else if (fs.pathExistsSync(envPath)) {
         fs.copySync(envPath, path.join(distPath, '.env'));
     }
-    // 读写serverless.yml，文件由运维提供
-    const targetYmlPath = path.join(rootPath, `./serverless.${target}.yml`);
-    const ymlPath = path.join(rootPath, './serverless.yml');
-    const tplPath = path.join(serverlessPath, './serverless.tpl.yml');
-    if (!fs.pathExistsSync(targetYmlPath) && !fs.pathExistsSync(ymlPath)) {
-        slsErr(
-            `"serverless.yml" or "serverless.${target}.yml" could not be found!`
-        );
+
+    /**
+     * 发布到……
+     * @param {'public'|'server'} to
+     */
+    const deployTo = async (to) => {
+        slsLogDeploy(`Deploying to "${to}"...`);
+
+        const distYmlPath = path.join(distPath, 'serverless.yml');
+
+        slsLogDeploy(`Removing "serverless.yml" from "dist" folder if exists...`);
+        try{
+            fs.removeSync(distYmlPath);
+        } catch(e) {}
+
+        const toPath = path.join(distPath, to);
+        if (!fs.pathExistsSync(toPath)) {
+            slsErr(
+                `Folder "${toPath}" could not be found!`
+            );
+        }
+
+        const ymlFilename = `serverless_${to}.yml`;
+        const ymlPath = path.join(distPath, ymlFilename);
+        if (!fs.pathExistsSync(ymlPath)) {
+            slsErr(
+                `YAML file "${ymlPath}" could not be found!`
+            );
+        }
+
+        const ymlOptions = yaml.load(fs.readFileSync(ymlPath, 'utf8'));
+        slsLogDeploy(`Update "src"`);
+        ymlOptions.inputs.src.src = toPath;
+
+        slsLogDeploy(`Writing "${to}" config to "serverless.yml" in "dist" folder...`);
+        const ymlContent = yaml.dump(ymlOptions, { indent: 4 });
+        fs.outputFileSync(distYmlPath, ymlContent);
+
+        slsLogDeploy(`Start deploying to "${to}"...`);
+        await spawn(`cd ${distPath} && scf deploy --debug`);
+
+        slsLogDeploy(`Cleaning...`);
+        fs.removeSync(distYmlPath);
+
+        slsLogDeploy(`✅Complete! Deployed to "${to}"!\n\n\n`);
     }
-    let slsOptions = yaml.load(
-        fs.readFileSync(
-            fs.pathExistsSync(targetYmlPath) ? targetYmlPath : ymlPath,
-            'utf8'
-        )
-    );
-    // merge
-    if (fs.pathExistsSync(tplPath)) {
-        // console.log(slsOptions)
-        slsLogDeploy('Merge options from "serverless.tpl.yml"');
-        const tplOptions = yaml.load(fs.readFileSync(tplPath, 'utf8'));
-        const mergefn = (objValue, srcValue) => {
-            if (!objValue || objValue === '__NEED_REPLACE__') {
-                return srcValue;
-            }
-            if (_.isArray(objValue)) {
-                return objValue.concat(srcValue);
-            }
-            if (_.isObject(objValue)) {
-                return _.mergeWith(objValue, srcValue, mergefn);
-            }
-            return objValue;
-        };
-        slsOptions = _.mergeWith(tplOptions, slsOptions, mergefn);
-    }
 
-    slsLogDeploy('Update "code" in "serverless.yml"');
-    try{
-        slsOptions['koot-csr'].inputs.code.root = publicPath;
-        slsOptions['koot-ssr'].inputs.code = serverPath;
-    }catch(e){}
+    // 发布静态资源
+    await deployTo('public');
 
-    const slsYamlContent = yaml.dump(slsOptions, { indent: 4 });
-    fs.outputFileSync(path.join(distPath, 'serverless.yml'), slsYamlContent);
-
-    console.log('YML', slsYamlContent)
-
-    // sls发布
-    slsLogDeploy('serverless deploy begin!');
-    await spawn(`cd ${distPath} && scf deploy --debug`);
+    // 发布SSR
+    await deployTo('server');
 };
 
 module.exports = deploy;
