@@ -98,7 +98,7 @@ const deploy = async () => {
         }
 
         const ymlFilename = `serverless_${to}.yml`;
-        const ymlPath = path.join(distPath, ymlFilename);
+        const ymlPath = path.join(rootPath, ymlFilename);
         if (!fs.pathExistsSync(ymlPath)) {
             slsErr(
                 `YAML file "${ymlPath}" could not be found!`
