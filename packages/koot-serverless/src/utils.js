@@ -18,7 +18,7 @@ const spawn = async cmd => {
         const child = require('child_process').spawn(chunks.shift(), chunks, {
             stdio: 'inherit',
             shell: true,
-            cwd: __dirname
+            cwd: __dirname,
         });
         child.on('close', () => {
             resolve();
@@ -28,7 +28,7 @@ const spawn = async cmd => {
 
 const slsErr = msg => {
     console.log(`[koot-serverless]Error: ${msg}`);
-    process.exit();
+    process.exit(1);
 };
 const slsLog = (...msgs) => {
     console.log('[koot-serverless]', ...msgs);
@@ -38,5 +38,5 @@ module.exports = {
     getVersion,
     spawn,
     slsErr,
-    slsLog
+    slsLog,
 };
