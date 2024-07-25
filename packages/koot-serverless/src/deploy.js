@@ -39,6 +39,9 @@ const slsLogDeploy = (...args) => slsLog('Deploying:', ...args);
  * - 该命令以项目根目录为运行目录
  */
 const deploy = async () => {
+    slsLogDeploy('Infos...');
+    await spawn(`node -v`);
+
     /** 目标环境，如 `prod`，取自运行的命令 */
     const target = process.argv[2];
     if (!target) slsErr('USAGE: koot-serverless <target>');
@@ -62,7 +65,7 @@ const deploy = async () => {
 
     if (!code) slsErr('Prop "code" is Required in "serverless/config.js"!');
     // 安装依赖
-    slsLogDeploy('Installing dependencies');
+    slsLogDeploy('Installing dependencies...');
     await spawn(`cd ${serverPath} && yarn`);
     const fs = require('fs-extra');
     const yaml = require('js-yaml');

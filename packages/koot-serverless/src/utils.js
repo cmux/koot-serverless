@@ -21,18 +21,24 @@ const spawn = async cmd => {
             cwd: __dirname,
         });
 
-        child.on('close', () => {
-            resolve();
+        child.on('error', (err) => {
+            console.log('error')
+            reject(err);
         });
 
-        child.stderr.on('data', (data) => {
-            throw new Error(data.toString(), { stderr: data });
+        child.on('close', (code) => {
+            if (code !== 0) {
+                slsErr(`Command failed with code ${code}`)
+                process.exit(1);
+            }
+
+            resolve();
         });
     });
 };
 
 const slsErr = msg => {
-    console.log(`[koot-serverless]Error: ${msg}`);
+    console.log(`[koot-serverless] 💥 Error: ${msg}`);
     process.exit(1);
 };
 const slsLog = (...msgs) => {
