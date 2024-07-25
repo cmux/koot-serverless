@@ -118,7 +118,13 @@ const deploy = async () => {
         fs.outputFileSync(distYmlPath, ymlContent);
 
         slsLogDeploy(`Start deploying to "${to}"...`);
-        await spawn(`cd ${distPath} && scf deploy --debug`);
+        try{
+            await spawn(`cd ${distPath} && scf deploy --debug`);
+        } catch(e) {
+            slsErr(
+                e.stderr || e.message || e
+            );
+        }
 
         slsLogDeploy(`Cleaning...`);
         fs.removeSync(distYmlPath);

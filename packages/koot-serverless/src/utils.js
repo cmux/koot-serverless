@@ -14,14 +14,19 @@ const getVersion = (prefix = 'release-') => {
 const spawn = async cmd => {
     slsLog(`=> ${cmd}`);
     const chunks = cmd.split(' ');
-    await new Promise(resolve => {
+    await new Promise((resolve, reject) => {
         const child = require('child_process').spawn(chunks.shift(), chunks, {
             stdio: 'inherit',
             shell: true,
             cwd: __dirname,
         });
+
         child.on('close', () => {
             resolve();
+        });
+
+        child.stderr.on('data', (data) => {
+            throw new Error(data.toString(), { stderr: data });
         });
     });
 };
