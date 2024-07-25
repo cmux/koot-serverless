@@ -1,3 +1,7 @@
+entryFile 需要暴露 Koa 实例
+
+
+
 # Serverless迁移步骤
 ## 确认安装koot@0.13.3以上版本
 可以使用koot-cli进行升级
@@ -6,9 +10,9 @@ npx koot-cli
 ```
 版本跨度较大时，需要进行迁移测试。
 ## 下载koot-serverless模板里的serverless文件夹
-下载serverless文件夹，复制到项目根目录下  
+下载serverless文件夹，复制到项目根目录下
 https://github.com/cmux/koot-serverless/tree/master/packages/koot-serverless
->Tips：  
+>Tips：
 >可以使用chrome插件[GitZip](https://chrome.google.com/webstore/detail/gitzip-for-github/ffabmkklhbepgcgfonabamgnfafbdlkn)进行github文件夹打包下载
 ## 安装koot-serverless
 ```
@@ -32,7 +36,7 @@ prod对应生产环境，qa对应测试环境。
 }
 ```
 ## 整理依赖
-把`package.json`里，`dependencies`里的依赖移到`devDependencie`s里，服务端依赖除外。  
+把`package.json`里，`dependencies`里的依赖移到`devDependencie`s里，服务端依赖除外。
 ## 与运维对接创建发布流程
 ### 配置 publicPath
 需要运维提供cos绑定的域名或者腾讯提供的免费域名，写入`serverless/config.js`的`publicPath`。

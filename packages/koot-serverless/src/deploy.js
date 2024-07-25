@@ -17,7 +17,7 @@
  *  │    │    │    └── 📂 [COS桶名称]
  *  │    │    │         └── 📄 [静态资源]...
  *  │    │    ├── 📂 server                 SSR服务器，需上传到 `Serverless`
- *  │    │    │    ├── 📄 scf_bootstrap     **⚠运维提供⚠** Serverless 运行脚本
+ *  │    │    │    ├── 📄 app.js            **⚠打包自动生成⚠** 输出 KOA 示例的入口文件
  *  │    │    │    └── 📄 [SSR脚本 & 资源]...
  *  │    │    ├── 📄 serverless_public.yml  **⚠运维提供⚠** 静态服务器上传配置
  *  │    │    └── 📄 serverless_server.yml  **⚠运维提供⚠** SSR服务器上传配置
@@ -109,6 +109,9 @@ const deploy = async () => {
         const ymlOptions = yaml.load(fs.readFileSync(ymlPath, 'utf8'));
         slsLogDeploy(`Update "src"`);
         ymlOptions.inputs.src.src = toPath;
+        if (to === 'server') {
+            ymlOptions.inputs.entryFile = 'app.js'
+        }
 
         slsLogDeploy(`Writing "${to}" config to "serverless.yml" in "dist" folder...`);
         const ymlContent = yaml.dump(ymlOptions, { indent: 4 });
