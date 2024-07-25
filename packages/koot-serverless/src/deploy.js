@@ -112,9 +112,9 @@ const deploy = async () => {
         const ymlOptions = yaml.load(fs.readFileSync(ymlPath, 'utf8'));
         slsLogDeploy(`Update "src"`);
         ymlOptions.inputs.src.src = toPath;
-        if (to === 'server') {
-            ymlOptions.inputs.entryFile = 'app.js'
-        }
+        // if (to === 'server') {
+        //     ymlOptions.inputs.entryFile = 'app.js'
+        // }
 
         slsLogDeploy(`Writing "${to}" config to "serverless.yml" in "dist" folder...`);
         const ymlContent = yaml.dump(ymlOptions, { indent: 4 });
