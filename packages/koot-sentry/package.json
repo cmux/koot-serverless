@@ -23,7 +23,7 @@
         "node": ">=8.9.0"
     },
     "dependencies": {
-        "@sentry/browser": "5.29.2",
+        "@sentry/browser": "8.33.0",
         "@sentry/cli": "^2.21.2",
         "fs-extra": "*"
     }
